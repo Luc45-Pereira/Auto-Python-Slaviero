@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[7]:
-
-
 #Parte para entrar na aba perguntas
 
 #imprta slenium para abrir navegador
@@ -15,7 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 #possiveis perg
-posi = ['serve', 'funciona', 'funcionaria', 'encaixa']
+posi = "serve funciona funcionaria encaixa"
+posi = posi.split()
 
 #abre navegador
 navegador = webdriver.Chrome()
@@ -36,7 +31,7 @@ navegador.find_element_by_xpath('//*[@id="seller_questions"]').click()
 
 #pega quantas pergutas tem
 name = navegador.find_element_by_xpath('//*[@id="page"]/div[4]/div[3]/div').text
-n = re.sub('[^0-9]', '', name)
+name = re.sub('[^0-9]', '', name)
 print(name)
 navegador.find_element_by_xpath('/html/body/div[9]/div[1]/div/div[2]/button').click()
 
@@ -66,13 +61,21 @@ for perg in range(int(name)):
         ab = navegador.find_element(By.XPATH, abrir)
         
         navegador.execute_script("arguments[0].click();", ab)
-
-    #concatena elemento XPATH
-    per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
     
-    per2 = "]/div[3]/div[1]/div[2]/span[2]/span[1]"
+    if(perg >= 0):
+        #concatena elemento XPATH
+        per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
     
-    pergunta = per1+str(f)+per2
+        per2 = "]/div[3]/div[1]/div[2]/span[2]/span[1]"
+    
+        pergunta = per1+str(f)+per2
+        
+    if(int(name) == 1):
+        #concatena elemento XPATH
+        per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+    
+        per2 = "/div[3]/div[1]/div[2]/span[2]/span[1]"
+        pergunta = per1+per2
     
     print(pergunta)
     
@@ -189,25 +192,55 @@ for perg in range(int(name)):
                 #Reponde o Cliente
                 navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[1]/label/div[1]/textarea').send_keys("Olá, Serve sim, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
                 navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[2]/button').click()
+                perg = 0
             else:
                 #Reponde o Cliente
                 navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[1]/label/div[1]/textarea').send_keys("Olá, infelismente não serve, dê mais uma olhada em nossa loja tenho certeza que encontrará o que procura, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
                 navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[2]/button').click()
-    
+                perg = 0
     #verifica se foi encontrado a palavra chassi
-    if(cha == "achei"):
+    if(cha == "n"):
         
         #se não foi encontrado inicia loop enquanto tiver elementos na lista
         for i in range(len(n)):
-            
+            nu = 0
             #verifica se existe as palavras contidas na lista posi
-            if (n[i] == posi[n] or n[i] == posi[n+1] or n[i] == posi[n+2] or n[i] == posi[n+3]):
+            if (n[i] == posi[nu] or n[i] == posi[nu+1] or n[i] == posi[nu+2] or n[i] == posi[nu+3]):
+                perg = 0
+                if(int(name) == 1):
+                    print('consegui')
+                    #concatena elemento XPATH
+                    per3 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+    
+                    per4 = "/div[3]/div[2]/div[1]/label/div[1]/textarea"
+                    pergunta = per3+per4
+            
+                    cli1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+    
+                    cli2 = "/div[3]/div[2]/div[2]/button"
+                    cli = cli1+cli2
                 
-                #Reponde o Cliente
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[1]/label/div[1]/textarea').send_keys("Olá, poderi me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[2]/button').click()
+                    #Reponde o Cliente
+                    navegador.find_element(By.XPATH, pergunta).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                    navegador.find_element(By.XPATH, cli).click()
+                else:
+                    print('consegui1')
+                    #concatena elemento XPATH
+                    per5 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+    
+                    per6 = "]/div[3]/div[2]/div[1]/label/div[1]/textarea"
+    
+                    pergunta = per5+str(f)+per6
+                
+                    cli1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+    
+                    cli2 = "]/div[3]/div[2]/div[2]/button"
+                
+                    cli = cli1+str(f)+cli2
+                
+                    #Reponde o Cliente
+                    navegador.find_element(By.XPATH, pergunta).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                    navegador.find_element(By.XPATH, cli).click()
             
     
     
-
-
