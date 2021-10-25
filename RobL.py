@@ -1,6 +1,12 @@
-#Parte para entrar na aba perguntas
 
-#imprta slenium para abrir navegador
+# Dev: Lucas Pereira de Lima
+# Data de desenvolvimento: outubro de 2021
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Sistema de automação de respostas do mercado livre para a empresa Ford Slaviero
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Importing libraries
 from selenium import webdriver
 import re
 from selenium.webdriver.common.by import By
@@ -8,239 +14,330 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-#possiveis perg
-posi = "serve funciona funcionaria encaixa"
-posi = posi.split()
+#question types
+questions = "serve funciona funcionaria encaixa"
+questions = questions.split()
 
-#abre navegador
-navegador = webdriver.Chrome()
+#open browser
+browser1 = webdriver.Chrome()
 
-#vai no site do mercado livre
-navegador.get("https://www.mercadolivre.com/jms/mlb/lgz/msl/login/H4sIAAAAAAAEAzXOwQrDIBAE0H-ZsyR3j_2RsDGrkWqVdVNbQv692NLjwPBmTqQS4mPRd2VY8Kum6KLCoCZSXyQvcYNFTjBoUfkf11EhoczK0mDPAQXebuyLDErlYBjQofviU-mwvykYhAKLXbU2O8-99ymzONpKik_hyZU8rTLDQDjEpiw8Hny9y8BT00WF3B3WU2p8fQC9dzgpxAAAAA/user")
+#enter the Mercado Livre
+browser1.get("https://www.mercadolivre.com/jms/mlb/lgz/msl/login/H4sIAAAAAAAEAzXOwQrDIBAE0H-ZsyR3j_2RsDGrkWqVdVNbQv692NLjwPBmTqQS4mPRd2VY8Kum6KLCoCZSXyQvcYNFTjBoUfkf11EhoczK0mDPAQXebuyLDErlYBjQofviU-mwvykYhAKLXbU2O8-99ymzONpKik_hyZU8rTLDQDjEpiw8Hny9y8BT00WF3B3WU2p8fQC9dzgpxAAAAA/user")
 
-#espera 5min
-navegador.implicitly_wait(300)
+#open the new browser for catalogo
+browser2 = webdriver.Chrome()
+browser2.get("https://fordcatalog.com/")
 
-#clica no menu
-navegador.find_element_by_xpath('//*[@id="nav-header-menu"]/div').click()
+#wait until it loads completely
+WebDriverWait(browser2, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#content1")))
 
-#entra em perguntas
-navegador.find_element_by_xpath('//*[@id="nav-header-menu"]/div/nav/div[1]/div[2]/a[2]').click()
-navegador.find_element_by_xpath('//*[@id="root-app"]/div/div/div[1]/nav/div/div/div[1]/section[2]/div[1]/span/div/label').click()
-navegador.find_element_by_xpath('//*[@id="seller_questions"]').click()
+#Wait 5 minutes
+browser1.implicitly_wait(300)
 
-#pega quantas pergutas tem
-name = navegador.find_element_by_xpath('//*[@id="page"]/div[4]/div[3]/div').text
-name = re.sub('[^0-9]', '', name)
-print(name)
-navegador.find_element_by_xpath('/html/body/div[9]/div[1]/div/div[2]/button').click()
+#click in menu
+browser1.find_element_by_xpath('//*[@id="nav-header-menu"]/div').click()
 
-#verifica se existem perguntas
-for perg in range(int(name)):
-    f = perg + 1
+#open option questions in browser1 using an auxiliary variable
+aux = browser1.find_element_by_xpath('/html/body/div[9]/div[1]/div/div[2]/button')
+browser1.execute_script("arguments[0].click();", aux)
+
+aux = browser1.find_element_by_xpath('//*[@id="root-app"]/div/div/div[1]/nav/div/div/div[1]/section[2]/div[1]/span/div/label')
+browser1.execute_script("arguments[0].click();", aux)
+
+aux = browser1.find_element_by_xpath('//*[@id="seller_questions"]')
+browser1.execute_script("arguments[0].click();", aux)
+
+#wait 10seg
+browser1.implicitly_wait(10)
+
+#close info window
+aux = browser1.find_element_by_xpath('/html/body/div[9]/div[1]/div/div[2]/button')
+browser1.execute_script("arguments[0].click();", aux)
+
+#Get number of questions
+number_questions = browser1.find_element_by_xpath('//*[@id="page"]/div[4]/div[3]/div').text
+
+#remove all text and leave only numbers
+number_questions = re.sub('[^0-9]', '', number_questions)
+
+#show number in console
+print(number_questions)
+
+#start new auxiliary variable
+aux1 = 0
+
+#start loop until there are no more questions
+for i in range(int(number_questions)):
+    #check auxiliary variable 2 to reset auxiliary variable 1
+    if(aux2 == 'res'):
+        aux1 = 0
+        a = ''
     
-    #cria variavel num
+    #Get number of questions
+    number_questions = browser1.find_element_by_xpath('//*[@id="page"]/div[4]/div[3]/div').text
+
+    #remove all text and leave only numbers
+    number_questions = re.sub('[^0-9]', '', number_questions)
+ 
+    #auxiliary variable
+    aux3 = aux1 + 1
+
+    #new variable num
     num = 0
-    
-    #pega o codigo da peca
-    cod = navegador.find_element_by_xpath('//*[@id="page"]/div[5]/div/div[1]/div/div[1]/div[2]/div[1]/a').text
+
+    #get the part code of the ad
+    cod = browser1.find_element_by_xpath('//*[@id="page"]/div[5]/div/div[1]/div/div[1]/div[2]/div[1]/a').text
+
+    #turn into list
     cod = cod.split()
-    
-    #verifica se perg é maior que 0
-    if(perg > 0):
+
+    #check i is greater than 0
+    if(i > 0):
+        #concatenates XPATH element so that it takes an element from the question list
+        xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+        xpath2 = "]/div[3]/div[2]"
+
+        xpath_full = xpath1 + str(aux3) + xpath2
+
+        #select element
+        aux = browser1.find_element(By.XPATH, xpath_full)
         
-        #concatena elemento XPATH
-        per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+        #click in element
+        browser1.execute_script("arguments[0].click();", aux)
+    
+    #check i is greater or like 0
+    if(i >= 0):
+        #concatenates XPATH element so that it takes an element from the question list
+        xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+        xpath2 = "]/div[3]/div[2]"
+
+        xpath_full = xpath1 + str(aux3) + xpath2
+    
+    #check if number_questions is like 1 and i greater 0
+    if(int(number_questions) == 1 and i > 0):
+        #concatenate XPATH element so that it takes an element from the question list
+        xpath_full = '//*[@id="page"]/div[5]/div/div[2]/ul/li/div[3]/div[2]'
+
+        #click in element
+        aux = browser1.find_element(By.XPATH, xpath_full)
+        browser1.execute_script("arguments[0].click();", aux)
+
+        #concatenates the xpath element
+        xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+
+        xpath2 = "/div[3]/div[1]/div[2]/span[2]/span[1]"
+
+        xpath_full = xpath1 + xpath2
+
+    else:
+        #concatenates element XPATH
+        xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+
+        xpath2 = "/div[3]/div[1]/div[2]/span[2]/span[1]"
+
+        xpath_full = xpath1 + xpath2
+    
+    #get question
+    aux_question = browser1.find_element_by_xpath(xpath_full).text
+
+    #turn into list
+    aux_question = aux.split()
+
+    #variable to know if it found the chassi
+    chassi = "no"
+
+    #loop while there are elements in the list
+    for i in range(len(aux_question)):
         
-        per2 = "]/div[3]/div[2]"
-        
-        abrir = per1 + str(f) + per2
-        
-        print(abrir)
-        
-        ab = navegador.find_element(By.XPATH, abrir)
-        
-        navegador.execute_script("arguments[0].click();", ab)
-    
-    if(perg >= 0):
-        #concatena elemento XPATH
-        per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
-    
-        per2 = "]/div[3]/div[1]/div[2]/span[2]/span[1]"
-    
-        pergunta = per1+str(f)+per2
-        
-    if(int(name) == 1):
-        #concatena elemento XPATH
-        per1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
-    
-        per2 = "/div[3]/div[1]/div[2]/span[2]/span[1]"
-        pergunta = per1+per2
-    
-    print(pergunta)
-    
-    #pega a pergunta
-    n = navegador.find_element_by_xpath(pergunta).text
-    print("pegou pergunta")
-    
-    #converte string em lista
-    n = n.split()
-    print(n)
-    
-    #variavel para saber se encontrou o chassi
-    cha = "n"
-    
-    #loop enquanto tiver elementos na lista
-    for i in range(len(n)):
-        
-        print("procurando chassi")
-        
-        #se per[i] for igual a "chassi"
-        if(n[i]=="chassi" or n[i]=="Chassi"):
-            
-            #variavel para saber se encontrou o chassi
-            cha = "achei"
-            
-            #coloca i+1 na variavel num
+        #check if aux_question like chassi
+        if(aux_question == "chassi" or aux_question == "Chassi"):
+            #variable to know if it found the chassi
+            chassi = 'yes'
+
+            #insert i+1 in num
             num = i+1
-            print(n[i+1])
-            
-            #abre nova janela com o catalogo
-            nav = webdriver.Chrome()
-            nav.get("https://fordcatalog.com/")
-            
-            #espera até que carregue por completo
-            WebDriverWait(nav, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#content1")))
-            
-            #seleciona o frame da tela
-            frame = nav.find_element(By.CSS_SELECTOR, '#content1')
-            
-            #entra no frame
-            nav.switch_to_frame(frame)
-            nav.implicitly_wait(20)
-            
-            #encontra a barra de usuario e digita o usuario
-            nav.find_element(By.CSS_SELECTOR, '#edtUsuario').send_keys("1289_lucas")
-            
-            #encontra a barra de senha e digita a senha
-            nav.implicitly_wait(20)
-            nav.find_element(By.CSS_SELECTOR, '#edtSenha').send_keys("0481b29")
-            
-            #clica em entrar
-            nav.implicitly_wait(20)
-            nav.find_element(By.CSS_SELECTOR, '#btLogin_text').click()
-            
-            #volta para o frame inicial
-            nav.switch_to.parent_frame()
-            
-            #aguarda 20 seg
-            nav.implicitly_wait(20)
-            
-            #busca proximo frame
-            WebDriverWait(nav, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#content2")))
-            
-            #seleciona o frame da tela
-            frame = nav.find_element(By.CSS_SELECTOR, '#content2')
-            
-            #entra no frame
-            nav.switch_to_frame(frame)
-            
-            #digita o chassi do veiculo
-            nav.find_element(By.CSS_SELECTOR, '#editChassi').send_keys(n[num])
-            
-            #clica em pesquisar
-            nav.find_element(By.CSS_SELECTOR, '#btChassi_text').click()
-            
-            #volta para o frame inicial
-            nav.switch_to.parent_frame()
-            
-            #busca proximo frame
-            WebDriverWait(nav, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#popContentFrame0")))
-            
-            #seleciona o frame da tela
-            frame = nav.find_element(By.CSS_SELECTOR, '#popContentFrame0')
-            
-            #entra no frame
-            nav.switch_to_frame(frame)
-            
-            #clica em navegar com VIN
-            nav.find_element(By.CSS_SELECTOR, '#btAvancarPesq_text').click()
-            
-            #volta para o frame inicial
-            nav.switch_to.parent_frame()
-            
-            #busca proximo frame
-            WebDriverWait(nav, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#content3")))
-            
-            #seleciona o frame da tela
-            frame = nav.find_element(By.CSS_SELECTOR, '#content3')
-            
-            #entra no frame
-            nav.switch_to_frame(frame)
-            
-            #pesquisa codigo da peca
-            nav.find_element(By.XPATH, '//*[@id="editBusca"]').send_keys(cod[1])
-            
-            #clica em pesquisar
-            nav.find_element(By.XPATH, '//*[@id="btBuscar_text"]').click()
-            
-            ser = nav.find_element(By.XPATH, '//*[@id="titResultados_text"]').text
-            ser = re.sub('[^0-9]', '', name)
-            
-            #verifica se a peca serve no carro
-            if(int(ser)>0):
-                #Reponde o Cliente
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[1]/label/div[1]/textarea').send_keys("Olá, Serve sim, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[2]/button').click()
-                perg = 0
+
+            #select frame in window
+            frame = browser2.find_element(By.CSS_SELECTOR, '#content1')
+
+            #into the frame
+            browser2.switch_to_frame(frame)
+            browser2.implicitly_wait(20)
+
+            #select input usuario and insert user
+            browser2.find_element(By.CSS_SELECTOR, '#edtUsuario').send_keys("1289_lucas")
+
+            #select input senha and insert pass
+            browser2.implicitly_wait(20)
+            browser2.find_element(By.CSS_SELECTOR, '#edtSenha').send_keys("0481b29")
+
+            #click in button
+            browser2.implicitly_wait(20)
+            browser2.find_element(By.CSS_SELECTOR, '#btLogin_text').click()
+
+            #return for frame principal
+            browser2.switch_to.parent_frame()
+
+            #wait 20 seg
+            browser2.implicitly_wait(20)
+
+            #wait new frame
+            WebDriverWait(browser2, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#content2')))
+
+            #select frame
+            frame = browser2.find_element(By.CSS_SELECTOR, '#content2')
+
+            #into the frame
+            browser2.switch_to_frame(frame)
+
+            #search chassi
+            browser2.find_element(By.CSS_SELECTOR, '#editChassi').send_keys(n[num])
+
+            #click in pesquisar
+            browser2.find_element(By.CSS_SELECTOR, '#btChassi_text').click()
+
+            #return for frame principal
+            browser2.switch_to.parent_frame()
+
+            #wait 10 seg
+            browser2.implicitly_wait(10)
+
+            #wait new frame
+            WebDriverWait(browser2, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#popContentFrame0')))
+
+            #select frame
+            frame = browser2.find_element(By.CSS_SELECTOR, '#popContentFrame0')
+
+            #into the frame
+            browser2.switch_to_frame(frame)
+
+            #click in browse with VIN
+            browser2.find_element(By.CSS_SELECTOR, '#btAvancarPesq_text').click()
+
+            #return for frame principal
+            browser2.switch_to.parent_frame()
+
+             #wait new frame
+            WebDriverWait(browser2, 21).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#content3')))
+
+            #select frame
+            frame = browser2.find_element(By.CSS_SELECTOR, '#content3')
+
+            #into the frame
+            browser2.switch_to_frame(frame)
+
+            #part code search
+            browser2.find_element(By.XPATH, '//*[@id="editBusca"]').send_keys(cod[1])
+
+            #click in search
+            browser2.find_element(By.XPATH, '//*[@id="btBuscar_text"]').click()
+
+            #get result
+            result = browser2.find_element(By.XPATH, '//*[@id="titResultados_text"]').text
+            result = re.sub('[^0-9]', '', result)
+
+            #return for frame principal
+            browser2.switch_to.parent_frame()
+
+            #check if there is a result
+            if(int(result) > 0):
+                #concatenates element XPATHS
+                xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                xpath2 = "]/div[3]/div[2]/div[1]/label/div[1]/textarea"
+
+                xpath_full = xpath1 + str(aux3) + xpath2
+
+                btn1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                btn2 = "]/div[3]/div[2]/div[2]/button"
+
+                full_xpathBtn = btn1 + str(aux3) + btn2
+
+                #answers the client
+                browser1.find_element(By.XPATH, xpath_full).send_keys("Olá, Serve sim, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                aux = browser1.find_element(By.XPATH, full_xpathBtn)
+                browser1.execute_script("arguments[0].click();", aux)
+                aux1 = 0
             else:
-                #Reponde o Cliente
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[1]/label/div[1]/textarea').send_keys("Olá, infelismente não serve, dê mais uma olhada em nossa loja tenho certeza que encontrará o que procura, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
-                navegador.find_element(By.XPATH, '//*[@id="page"]/div[5]/div/div[2]/ul/li[2]/div[3]/div[2]/div[2]/button').click()
-                perg = 0
-    #verifica se foi encontrado a palavra chassi
-    if(cha == "n"):
-        
-        #se não foi encontrado inicia loop enquanto tiver elementos na lista
-        for i in range(len(n)):
-            nu = 0
-            #verifica se existe as palavras contidas na lista posi
-            if (n[i] == posi[nu] or n[i] == posi[nu+1] or n[i] == posi[nu+2] or n[i] == posi[nu+3]):
-                perg = 0
-                if(int(name) == 1):
-                    print('consegui')
-                    #concatena elemento XPATH
-                    per3 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+                #concatenates element XPATHS
+                xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                xpath2 = "]/div[3]/div[2]/div[1]/label/div[1]/textarea"
+
+                xpath_full = xpath1 + str(aux3) + xpath2
+
+                btn1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                btn2 = "]/div[3]/div[2]/div[2]/button"
+
+                full_xpathBtn = btn1 + str(aux3) + btn2
+
+                #answers the client
+                browser1.find_element(By.XPATH, xpath_full).send_keys("Olá, infelismente não serve, dê mais uma olhada em nossa loja tenho certeza que encontrará o que procura, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                aux = browser1.find_element(By.XPATH, full_xpathBtn)
+                browser1.execute_script("arguments[0].click();", aux)
+                aux1 = 0
+
+            #back to catalog homepage
+            browser2.get("https://fordcatalog.com/")
     
-                    per4 = "/div[3]/div[2]/div[1]/label/div[1]/textarea"
-                    pergunta = per3+per4
-            
-                    cli1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
-    
-                    cli2 = "/div[3]/div[2]/div[2]/button"
-                    cli = cli1+cli2
-                
-                    #Reponde o Cliente
-                    navegador.find_element(By.XPATH, pergunta).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
-                    navegador.find_element(By.XPATH, cli).click()
+    #check if the word chassis was found
+    if(chassi == "no"):
+
+        #if not found start loop while have elements in list
+        for i in range(len(aux_question)):
+            aux0 = 0
+            aux1 += 1
+            #check for the words contained in the posi list
+            if(aux_question[i] == questions[aux0] or aux_question[i] == questions[aux0 + 1] or aux_question[i] == questions[aux0 + 2] or aux_question[i] == questions[aux0 + 3]):
+                aux1 = 0
+                if(int(number_questions) == 1):
+                      #concatenates element XPATHS
+                    xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+
+                    xpath2 = "/div[3]/div[2]/div[1]/label/div[1]/textarea"
+
+                    xpath_full = xpath1 + xpath2
+
+                    btn1 = "//*[@id='page']/div[5]/div/div[2]/ul/li"
+
+                    btn2 = "/div[3]/div[2]/div[2]/button"
+
+                    full_xpathBtn = btn1 + btn2
+
+                    #answers the client
+                    browser1.find_element(By.XPATH, xpath_full).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                    aux = browser1.find_element(By.XPATH, full_xpathBtn)
+                    browser1.execute_script("arguments[0].click();", aux)
+                    aux1 = 0
                 else:
-                    print('consegui1')
-                    #concatena elemento XPATH
-                    per5 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
-    
-                    per6 = "]/div[3]/div[2]/div[1]/label/div[1]/textarea"
-    
-                    pergunta = per5+str(f)+per6
-                
-                    cli1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
-    
-                    cli2 = "]/div[3]/div[2]/div[2]/button"
-                
-                    cli = cli1+str(f)+cli2
-                
-                    #Reponde o Cliente
-                    navegador.find_element(By.XPATH, pergunta).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
-                    navegador.find_element(By.XPATH, cli).click()
-            
-    
-    
+                    #concatenates element XPATHS
+                    xpath1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                    xpath2 = "]/div[3]/div[2]/div[1]/label/div[1]/textarea"
+
+                    xpath_full = xpath1 + str(aux3) + xpath2
+
+                    btn1 = "//*[@id='page']/div[5]/div/div[2]/ul/li["
+
+                    btn2 = "]/div[3]/div[2]/div[2]/button"
+
+                    full_xpathBtn = btn1 + str(aux3) + btn2
+
+                    #answers the client
+                    browser1.find_element(By.XPATH, xpath_full).send_keys("Olá, poderia me enviar o chassi de seu veículo da seguinte maneira - 'Chassi numero_chassi', para que possamos lhe informar corretamente, Ford Slaviero agradece seu contato, e aguarda anciosamente por sua compra.")
+                    aux = browser1.find_element(By.XPATH, full_xpathBtn)
+                    browser1.execute_script("arguments[0].click();", aux)
+                    aux1 = 0
+
+#Get number of questions
+number_questions = browser1.find_element_by_xpath('//*[@id="page"]/div[4]/div[3]/div').text
+
+#remove all text and leave only numbers
+number_questions = re.sub('[^0-9]', '', number_questions)
+
+#show number in console
+print(number_questions)
